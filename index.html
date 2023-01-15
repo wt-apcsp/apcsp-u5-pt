@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="simpleTones.js"></script>
+    <title>AlgoVisualizer</title>
+</head>
+<body>
+    <main id="main">
+        <h1>AlgoVisualizer</h1>
+        <div class="slidecontainer">
+            <label for="blockSize">Block Size</label>
+            <input name="blockSize" type="range" min="1" max="2" value="1" class="slider" id="blockSizeRange" onchange="updateBlockSize(this.value)" onmousemove="updateBlockSize(this.value)">
+            <span id="blockSizeValue"></span>
+        </div>
+        <!-- TODO: Speed -->
+        <br>
+        <label for="algorithm">Select Algorithm</label>
+        <select id="algorithmSelect" name="algorithm">
+            <option value="bubble">Bubble Sort</option>
+            <option value="merge">Merge Sort</option>
+            <option value="selection">Selection Sort</option>
+            <option value="bogo">Bogo Sort</option>
+        </select>
+        <br><br>
+        <button onclick="start()">RUN</button>
+    </main>
+    <div id="info">
+        bubble-sort - xxx comparisons - xxx array accesses
+    </div>
+    <div id="header"></div>
+    <div id="overlay"></div>
+    <div id="countdown">
+
+    </div>
+    <canvas id="canvas"></canvas>
+    <script src="script.js"></script>
+</body>
+</html>
