@@ -1,4 +1,9 @@
-// https://github.com/escottalexander/simpleTones.js
+/***********************************
+* Title: simpleTones.js
+* Author: escottalexander
+* Date: Dec 7, 2022 (last committed)
+* Availability: https://github.com/escottalexander/simpleTones.js (github, open source)
+***********************************/
 
 //Create Audio Context
 let AudioContext = window.AudioContext || window.webkitAudioContext;
