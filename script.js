@@ -110,6 +110,10 @@ function updateSpeed(value) {
 function updateVolume(value) {
     // updateVolume(value): set volume global variable, called from volume slider
 
+    // user gesture is required to play audio (https://developers.google.com/web/updates/2017/09/autoplay-policy-changes)
+    context.resume(); // so we need to resume() the AudioContext
+    console.log(value);
+
     value = parseInt(value);
     volume = value/100;
 }
