@@ -11,13 +11,24 @@
 <body>
     <main id="main">
         <h1>AlgoVisualizer</h1>
-        <div class="slidecontainer">
+        <div>
             <label for="blockSize">Block Size</label>
-            <input name="blockSize" type="range" min="1" max="2" value="1" class="slider" id="blockSizeRange" onchange="updateBlockSize(this.value)" onmousemove="updateBlockSize(this.value)">
+            <input name="blockSize" type="range" min="1" value="1" class="slider" id="blockSizeRange" onchange="updateBlockSize(this.value)" onmousemove="updateBlockSize(this.value)">
             <span id="blockSizeValue"></span>
         </div>
-        <!-- TODO: Speed -->
         <br>
+        <div>
+            <label for="speed">Speed (ms per step)</label>
+            <input name="speed" type="range" min="1" max="1000" value="1" class="slider" id="speedRange" onchange="updateSpeed(this.value)" onmousemove="updateSpeed(this.value)">
+            <span id="speedValue"></span>
+        </div>
+        <br>
+        <label for="arraySetup">Array setup</label>
+        <select id="arraySetupSelect" name="arraySetup">
+            <option value="random">Random</option>
+            <option value="reverse">Reverse</option>
+        </select>
+        <br><br>
         <label for="algorithm">Select Algorithm</label>
         <select id="algorithmSelect" name="algorithm">
             <option value="bubble">Bubble Sort</option>
@@ -29,13 +40,16 @@
         <button id="start-button" onclick="start()">RUN</button>
     </main>
     <div id="info">
-        bubble-sort - xxx comparisons - xxx array accesses
+        bubble-sort - xxx steps - xxx comparisons - xxx array accesses
     </div>
     <div id="volume">
         <label for="volume">Volume</label>
-        <input name="volume" type="range" min="1" max="100" value="10" class="slider" id="volumeRange" onchange="updateVolume(this.value)" onmousemove="updateVolume(this.value)">
+        <input name="volume" type="range" min="1" max="100" value="1" class="slider" id="volumeRange" onchange="updateVolume(this.value)" onmousemove="updateVolume(this.value)">
     </div>
-    <div id="header"></div>
+    <div id="header">
+        <p>WARNING: this simulation contains flashing lights which may not be suitable for photosensitive epilepsy</p>
+        <h1 id="headerText"></h1>
+    </div>
     <div id="overlay"></div>
     <div id="countdown"></div>
     <canvas id="canvas"></canvas>
