@@ -119,7 +119,8 @@ const playChord = (chords = 440, type = "sine", duration = 1.3) => {
 const playSingleFrequency = (
   frequency = 440,
   type = "sine",
-  duration = 1.3
+  duration = 1.3,
+  volume = 0.1
 ) => {
   o = context.createOscillator();
   g = context.createGain();
@@ -129,7 +130,7 @@ const playSingleFrequency = (
   g.connect(context.destination);
   o.start(0);
   //g.gain.exponentialRampToValueAtTime(0.0001,context.currentTime + duration)
-  g.gain.setValueCurveAtTime(VOLUME_CURVE, context.currentTime, duration);
+  g.gain.setValueCurveAtTime(VOLUME_CURVE.map(v => v*volume), context.currentTime, duration);
 };
 
 //This function plays sounds

@@ -26,16 +26,18 @@
             <option value="bogo">Bogo Sort</option>
         </select>
         <br><br>
-        <button onclick="start()">RUN</button>
+        <button id="start-button" onclick="start()">RUN</button>
     </main>
     <div id="info">
         bubble-sort - xxx comparisons - xxx array accesses
     </div>
+    <div id="volume">
+        <label for="volume">Volume</label>
+        <input name="volume" type="range" min="1" max="100" value="10" class="slider" id="volumeRange" onchange="updateVolume(this.value)" onmousemove="updateVolume(this.value)">
+    </div>
     <div id="header"></div>
     <div id="overlay"></div>
-    <div id="countdown">
-
-    </div>
+    <div id="countdown"></div>
     <canvas id="canvas"></canvas>
     <script src="script.js"></script>
 </body>

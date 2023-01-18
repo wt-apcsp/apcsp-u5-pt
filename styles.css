@@ -8,7 +8,9 @@ body {
     height: 100vh;
 }
 
-button, select, option {
+button,
+select,
+option {
     background-color: rgb(19, 19, 19) !important;
 }
 
@@ -27,6 +29,34 @@ main {
 h1 {
     margin: 10px;
     font-size: 5rem;
+}
+
+button {
+    background-color: #141414;
+    border: 2px solid rgba(54, 54, 54, 0.6);
+    outline: none;
+    border-radius: 50px;
+    height: 45px;
+    width: 130px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: white !important;
+    color: #141414 !important;
+    transition: 0.5s;
+}
+
+#volume {
+    position: absolute;
+    right: 20px;
+    margin-right: 50px;
+    z-index: 150;
+}
+
+#start-button {
+    font-weight: 700;
+    font-size: 15px;
 }
 
 #header {

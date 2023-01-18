@@ -5,6 +5,8 @@ let height;
 let barWidth = 9; // px width of each bar
 const barBorder = 1;
 const pxReservedFromTop = 30; // px reserved from the top
+let timeDelay = 1; // 10ms
+let volume = 0.1;
 
 let arr;
 let n;
@@ -44,16 +46,6 @@ function drawBars() {
     }
 }
 
-function drawBar(i, color="#FFF") {
-    // erase previous bar
-    ctx.fillStyle = "#131313";
-    ctx.clearRect(i*(barWidth+barBorder), 0, barWidth, height);
-
-    // draw new bar
-    ctx.fillStyle = color;
-    ctx.fillRect(i*(barWidth+barBorder), height-arr[i],barWidth, arr[i]);
-}
-
 // util function to shuffle an array by repeated swapping every index
 function shuffle(arr) {
     for(let i=0;i<arr.length;i++) {
@@ -73,8 +65,14 @@ function fadeTransition(elementId, opacity, delay) {
 function updateBlockSize(value) {
     // update block size
     value = parseInt(value)
-    document.getElementById("blockSizeValue").innerHTML = value;
+    valueStr = ("&nbsp;".repeat(3-value.toString().length))+value; // shift the number so that the bar won't move
+    document.getElementById("blockSizeValue").innerHTML = valueStr;
     barWidth = value;
+}
+
+function updateVolume(value) {
+    value = parseInt(value);
+    volume = value/100;
 }
 
 function start() {
@@ -92,10 +90,10 @@ function start() {
     drawBars();
 
     // fade away main, and fade in canvas
+    document.getElementById("header").innerHTML = "<h1>"+[...document.getElementById("algorithmSelect").children].find(x => x.value == document.getElementById("algorithmSelect").value).innerHTML + "</h1>";
     document.getElementById("main").style.opacity = "0";
     document.getElementById("overlay").style.opacity = "0.8";
 
-    document.getElementById("header").innerHTML = "<h1>"+[...document.getElementById("algorithmSelect").children].find(x => x.name = document.getElementById("algorithmSelect").value).innerHTML + "</h1>";
     fadeTransition("header", 1, 1000);
     fadeTransition("canvas", 1, 1000);
 
@@ -123,78 +121,228 @@ function start() {
     }), 1000);
 }
 
-function simulate(algorithm) {
-    let i = 0;
-    let s = false;
-    let h = arr.length;
-    let int;
+// Algorithm: a general abstract class that will be the base/parent of the actual algorithms
+class Algorithm {
+    name = ""; // algorithm name
 
-    let comparison = 0;
-    let arrayAccesses = 0;
-
-    function renderInfo() {
-        document.getElementById("info").innerHTML = `${algorithm} - ${comparison} comparisons - ${arrayAccesses} array accesses`;
+    constructor(arr) {
+        this.arr = arr;
+        this.comparisons = 0; // No. of comparisons (if statements)
+        this.arrayAccesses = 0; // No. of array accesses (eg. arr[i] or arr[i+1])
+        // this.interval = setInterval(this.next); // Store the interval that repeatedly runs the next() function, needed to pause it later in renderComplete
     }
 
-    function incrementComparisons(i) {
-        comparison += i;
-        renderInfo();
+    start() {
+        this.renderInfo();
+        this.interval = setInterval(this.next, timeDelay);
     }
 
-    function incrementArrayAccesses(i) {
-        arrayAccesses += i;
-        renderInfo();
+    renderInfo() {
+        document.getElementById("info").innerHTML = `${this.name} - ${this.comparisons} comparisons - ${this.arrayAccesses} array accesses`;
+    }
+    
+
+    incrementComparisons(i) {
+        this.comparisons += i;
+        this.renderInfo();
     }
 
-    function bubbleSort() {
-        if(i == h) {
-            drawBar(i, "#FFF");
-            if(!s) {
-                done = true;
-                clearInterval(int);
-                i = 1;
-                int = setInterval(completion, 10);
+    incrementArrayAccesses(i) {
+        this.arrayAccesses += i;
+        this.renderInfo();
+    }
+
+    drawBar(i, color="#FFF") {
+        // erase previous bar
+        ctx.fillStyle = "#131313";
+        ctx.clearRect(i*(barWidth+barBorder), 0, barWidth, height);
+    
+        // draw new bar
+        ctx.fillStyle = color;
+        ctx.fillRect(i*(barWidth+barBorder), height-this.arr[i], barWidth, this.arr[i]);
+    }
+
+    playSound(i) {
+        playSingleFrequency(200+this.arr[i]*2, 'sine', 0.005, volume);
+    }
+
+    renderComplete() {
+        // stops the interval
+        clearInterval(this.interval);
+
+        // render completed animation, green from left to right
+        let completionInt;
+        let i = 1;
+
+        let completion = () => {
+            if(i != this.arr.length) {
+                this.drawBar(i-1, "#00D600");
+                this.drawBar(i, "#FF170D");
+                this.playSound(i);
+                i++;
+            } else {
+                clearInterval(completionInt);
             }
-            h--;
-            i = 0;
-            s = false;
+        }
+        
+        completionInt = setInterval(completion, timeDelay); // this cannot be used inside a callback func for setInterval, so we just pass in the array
+    }
+
+    next() {
+        // a function called every interval
+
+    }
+}
+
+class BubbleSort extends Algorithm {
+    name = "bubble sort";
+    i = 0;
+    s = false;
+    h = arr.length;
+
+    constructor(arr) {
+        super(arr);
+    }
+
+    next = () => {
+        if(this.i == this.h) {
+            this.drawBar(this.i, "#FFF");
+            if(!this.s) {
+                this.renderComplete();
+            }
+            this.h--;
+            this.i = 0;
+            this.s = false;
         }
 
         // compare i to i+1
-        incrementComparisons(1);
-        incrementArrayAccesses(2)
-        if(arr[i] > arr[i+1]) {
-            s = true;
+        this.incrementComparisons(1);
+        this.incrementArrayAccesses(2)
+        if(this.arr[this.i] > this.arr[this.i+1]) {
+            this.s = true;
             // swap
-            let temp = arr[i+1];
-            arr[i+1] = arr[i];
-            arr[i] = temp;
+            let temp = this.arr[this.i+1];
+            this.arr[this.i+1] = this.arr[this.i];
+            this.arr[this.i] = temp;
 
-            incrementArrayAccesses(3);
+            this.incrementArrayAccesses(3);
 
             // rerender the bars
-            drawBar(i+1, "#FF170D");
-            playSingleFrequency(200+arr[i]*2, 'sine', 0.05);
+            this.drawBar(this.i+1, "#FF170D");
+            this.playSound(i);
         }
-        drawBar(i, "#FFF");
-        i++;
+        this.drawBar(this.i, "#FFF");
+        this.i++;
+    }
+}
+
+
+class SelectionSort extends Algorithm {
+    name = "selection sort";
+    i = 0; // start index of the unsorted array
+    j = 0; // pointer for searching in min value in the unsorted array
+    k = 0; // index of min
+    min;
+
+    constructor(arr) {
+        super(arr);
     }
 
-    function completion() {
-        if(i != arr.length) {
-            drawBar(i-1, "#00D600");
-            drawBar(i, "#FF170D");
-            playSingleFrequency(200+arr[i]*2, 'sine', 0.05);
-            i++;
+    next = () => {
+        // TODO: MAKE THIS BETTERRR, AND FIX IT
+
+        if (this.i != this.arr.length+1) {
+            if (this.i != this.j) {
+                this.drawBar(this.j-1);
+                this.drawBar(this.j, "#FF170D");
+            }
+
+            if(!this.min || this.arr[this.j] < this.min) {
+
+                this.min = arr[this.j];
+                this.k = this.j;
+            }
+
+            if (this.j == this.arr.length) {
+                // found the minimum, move from index k to i
+                let e = this.arr[this.k];
+                this.arr.splice(this.k, 1); // delete
+                this.arr.splice(this.i, 0, e) // add to index i
+
+                // draw
+                for(let l=0;l<this.arr.length;l++) {
+                    this.drawBar(l);
+                }
+                this.drawBar(this.i, "#00D600");
+
+                this.i++;
+                this.j = this.i; // set j to i
+                this.min = 0;
+                this.k;
+            }
+            this.j++;
         } else {
-            clearInterval(int);
+            this.renderComplete();
         }
     }
-        
-    if (algorithm === "bubble") {
-        // BUBBLE SORT
-        int = setInterval(bubbleSort,10);
+}
+
+
+class BogoSort extends Algorithm {
+    name = "bogo sort";
+
+    constructor(arr) {
+        super(arr);
     }
 
+    next = () => {
+        // check if the array is sorted
 
+        let s = true;
+
+        // check the permutation
+        for(let i=0;i<arr.length-1;i++) {
+            if(arr[i] > arr[i+1]) {
+                // unsorted
+                this.drawBar(i, "#FF170D");
+                s = false;
+                break;
+            }
+        }
+
+        if (s == true) {
+            this.renderComplete();
+            return;
+        }
+
+        // if not shuffle again, generate a random permuation of the array
+        this.arr = shuffle(this.arr)
+        for(let i=0;i<this.arr.length;i++) {
+            this.drawBar(i);
+        }
+    }
+}
+
+class MergeSort extends Algorithm {
+    name = "merge sort"
+
+    constructor(arr) {
+        super(arr);
+    }
+
+    next = () => {
+        
+    }
+}
+
+function simulate(algorithm) {
+    let algo;
+
+    switch(algorithm) {
+        case "bubble": algo = new BubbleSort(arr); break;
+        case "bogo": algo = new BogoSort(arr); break;
+        case "selection": algo = new SelectionSort(arr); break;
+    }
+
+    algo.start();
 }
