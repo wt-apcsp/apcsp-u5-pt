@@ -112,7 +112,6 @@ function updateVolume(value) {
 
     // user gesture is required to play audio (https://developers.google.com/web/updates/2017/09/autoplay-policy-changes)
     context.resume(); // so we need to resume() the AudioContext
-    console.log(value);
 
     value = parseInt(value);
     volume = value/100;
